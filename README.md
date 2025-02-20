@@ -4,8 +4,8 @@
 
 | 类型 | 源 | 链接 | 速度 |
 |--|--|--|--|
-|Docker| 毫秒镜像 | https://1ms.run/   | |
-|Docker| fast360 | https://fast360.xyz/   | |
+|Docker| 毫秒镜像 | https://docker.1ms.run   | |
+|Docker| fast360 | https://hub.fast360.xyz/   | |
 
 ## PiP
 
