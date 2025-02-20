@@ -34,12 +34,17 @@ jobs:
           IFS=$'\n'
           for mirror in ${{ env.docker_mirrors }}; do
             echo "Testing mirror: $mirror"
-            # 使用docker pull命令测试下载速度，这里以一个小型镜像为例
+            # 使用docker pull命令测试下载速度，使用较大的镜像
+            image="pytorch/pytorch:2.6.0-cuda12.4-cudnn9-runtime"
             start_time=$(date +%s)
-            docker pull --quiet "$mirror/library/hello-world"
+            docker pull "$mirror/$image"
             end_time=$(date +%s)
-            speed=$((end_time - start_time))
-            echo "Mirror $mirror speed: $speed seconds"
+            # 获取镜像大小
+            image_size=$(docker inspect --format='{{.Size}}' "$mirror/$image")
+            # 计算下载速度
+            duration=$((end_time - start_time))
+            speed=$(echo "scale=2; $image_size / $duration / 1024 / 1024" | bc) # 速度单位为MB/s
+            echo "Mirror $mirror speed: $speed MB/s"
             # 将速度信息存储到文件中
             echo "$mirror,$speed" >> mirror_speeds.csv
           done
@@ -50,7 +55,7 @@ jobs:
           # 更新README.md文件中的速度信息
           markdown_file="README.md"
           while IFS=, read -r mirror speed; do
-            sed -i "s|${mirror}.*$|${mirror} | ${speed}秒|" "$markdown_file"
+            sed -i "s|${mirror}.*$|${mirror} | ${speed} MB/s|" "$markdown_file"
           done < mirror_speeds.csv
 
       - name: Commit and push changes
