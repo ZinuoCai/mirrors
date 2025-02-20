@@ -2,23 +2,23 @@
 
 ## Docker
 
-| 源 | 链接 |
-|--|--|
-| 毫秒镜像 | https://1ms.run/ |
-| fast360 | https://fast360.xyz/ |
+| 类型 | 源 | 链接 | 速度 |
+|--|--|--|--|
+|Docker| 毫秒镜像 | https://1ms.run/   | |
+|Docker| fast360 | https://fast360.xyz/   | |
 
 ## PiP
 
 | 源 | 链接 |
 |--|--|
-| 清华 | https://pypi.tuna.tsinghua.edu.cn/simple |
-| 阿里云 | https://mirrors.aliyun.com/pypi/simple/  |
+| 清华 | https://pypi.tuna.tsinghua.edu.cn/simple   |
+| 阿里云 | https://mirrors.aliyun.com/pypi/simple/    |
 
 ## Node
 
 | 源 | 链接 |
 |--|--|
-| 淘宝 | https://registry.npmmirror.com/ |
+| 淘宝 | https://registry.npmmirror.com/   |
 
 ## Go
 
