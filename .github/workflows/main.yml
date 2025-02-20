@@ -1,0 +1,64 @@
+name: Docker Mirror Speed Test
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # 每天凌晨0点触发
+  workflow_dispatch: # 手动触发
+
+jobs:
+  test-mirrors:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Extract Docker mirror links
+        id: extract_links
+        run: |
+          #!/bin/bash
+          # 提取README.md文件中Docker镜像源链接
+          markdown_file="README.md"
+          docker_mirrors=$(grep -oP '(?<=Docker).+?(https://\S+)' "$markdown_file" | grep -oP 'https://\S+')
+          echo "Docker mirrors extracted: $docker_mirrors"
+          echo "docker_mirrors=$docker_mirrors" >> $GITHUB_ENV
+
+      - name: Test Docker mirror speed
+        id: test_speed
+        run: |
+          #!/bin/bash
+          # 测试每个镜像源的下载速度
+          IFS=$'\n'
+          for mirror in ${{ env.docker_mirrors }}; do
+            echo "Testing mirror: $mirror"
+            # 使用docker pull命令测试下载速度，这里以一个小型镜像为例
+            start_time=$(date +%s)
+            docker pull --quiet "$mirror/library/hello-world"
+            end_time=$(date +%s)
+            speed=$((end_time - start_time))
+            echo "Mirror $mirror speed: $speed seconds"
+            # 将速度信息存储到文件中
+            echo "$mirror,$speed" >> mirror_speeds.csv
+          done
+
+      - name: Update README.md with speed information
+        run: |
+          #!/bin/bash
+          # 更新README.md文件中的速度信息
+          markdown_file="README.md"
+          while IFS=, read -r mirror speed; do
+            sed -i "s|${mirror}.*$|${mirror} | ${speed}秒|" "$markdown_file"
+          done < mirror_speeds.csv
+
+      - name: Commit and push changes
+        run: |
+          #!/bin/bash
+          # 提交并推送README.md文件的更改
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add "$markdown_file"
+          git commit -m "Update Docker mirror speeds"
+          git push
